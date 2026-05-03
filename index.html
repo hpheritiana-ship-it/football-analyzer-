@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Analyzer Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-futbol"></i>
+                <span>Football<span class="accent">Analyzer</span></span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" onclick="showSection('dashboard')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li onclick="showSection('predictor')">
+                    <i class="fas fa-brain"></i>
+                    <span>Prédiction</span>
+                </li>
+                <li onclick="showSection('matches')">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Matchs du Jour</span>
+                </li>
+                <li onclick="showSection('history')">
+                    <i class="fas fa-history"></i>
+                    <span>Historique</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="risk-legend">
+                    <div class="risk-item">
+                        <span class="dot safe"></span>
+                        <span>Safe (70%+)</span>
+                    </div>
+                    <div class="risk-item">
+                        <span class="dot moderate"></span>
+                        <span>Moderate (55-70%)</span>
+                    </div>
+                    <div class="risk-item">
+                        <span class="dot risky"></span>
+                        <span>Risky (<55%)</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Rechercher une équipe...">
+                    </div>
+                    <div class="user-menu">
+                        <span class="live-indicator">
+                            <span class="pulse"></span>
+                            LIVE
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- DASHBOARD SECTION -->
+            <section id="dashboard" class="section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="stat-info">
+                            <h3>Précision ML</h3>
+                            <p class="stat-value">74.2%</p>
+                            <span class="stat-change positive">+2.4% ce mois</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h3>Predictions Aujourd'hui</h3>
+                            <p class="stat-value">12</p>
+                            <span class="stat-change positive">8 gagnées</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                        <div class="stat-info">
+                            <h3>Série en Cours</h3>
+                            <p class="stat-value">5W</p>
+                            <span class="stat-change positive">Meilleure: 12W</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                        <div class="stat-info">
+                            <h3>ROI Moyen</h3>
+                            <p class="stat-value">+18.5%</p>
+                            <span class="stat-change positive">Sur 30 jours</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card featured">
+                        <div class="card-header">
+                            <h2><i class="fas fa-star"></i> Top Prédictions du Jour</h2>
+                            <button class="btn-outline" onclick="showSection('matches')">Voir tout</button>
+                        </div>
+                        <div id="top-predictions" class="predictions-list">
+                            <div class="loading">Chargement...</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-pie"></i> Répartition des Risques</h2>
+                        </div>
+                        <div class="risk-chart">
+                            <div class="risk-bar">
+                                <div class="risk-segment safe" style="width: 35%"></div>
+                                <div class="risk-segment moderate" style="width: 45%"></div>
+                                <div class="risk-segment risky" style="width: 20%"></div>
+                            </div>
+                            <div class="risk-labels">
+                                <span><span class="dot safe"></span> Safe 35%</span>
+                                <span><span class="dot moderate"></span> Modéré 45%</span>
+                                <span><span class="dot risky"></span> Risqué 20%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PREDICTOR SECTION -->
+            <section id="predictor" class="section">
+                <div class="predictor-container">
+                    <div class="card predictor-form">
+                        <div class="card-header">
+                            <h2><i class="fas fa-brain"></i> Nouvelle Prédiction</h2>
+                        </div>
+                        <div class="form-group">
+                            <label>Championnat</label>
+                            <select id="league-select" onchange="loadTeams()">
+                                <option value="">Sélectionner...</option>
+                            </select>
+                        </div>
+                        <div class="teams-selector">
+                            <div class="form-group">
+                                <label>Équipe à Domicile</label>
+                                <select id="home-team">
+                                    <option value="">Sélectionner...</option>
+                                </select>
+                            </div>
+                            <div class="vs-divider">VS</div>
+                            <div class="form-group">
+                                <label>Équipe à l'Extérieur</label>
+                                <select id="away-team">
+                                    <option value="">Sélectionner...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn-primary" onclick="predictMatch()">
+                            <i class="fas fa-magic"></i> Analyser le Match
+                        </button>
+                    </div>
+
+                    <div id="prediction-result" class="prediction-result" style="display:none;">
+                        <!-- Résultat injecté par JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- MATCHES SECTION -->
+            <section id="matches" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-calendar-day"></i> Matchs du Jour</h2>
+                        <div class="filters">
+                            <button class="filter-btn active">Tous</button>
+                            <button class="filter-btn">Safe</button>
+                            <button class="filter-btn">Modéré</button>
+                        </div>
+                    </div>
+                    <div id="today-matches" class="matches-grid">
+                        <div class="loading">Chargement des matchs...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISTORY SECTION -->
+            <section id="history" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-history"></i> Historique des Prédictions</h2>
+                    </div>
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Match</th>
+                                <th>Prédiction</th>
+                                <th>Confiance</th>
+                                <th>Résultat</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>02/05/2026</td>
+                                <td>Man City vs Arsenal</td>
+                                <td>Over 2.5</td>
+                                <td><span class="confidence high">72%</span></td>
+                                <td>3-1</td>
+                                <td><span class="status win">✓ Gagné</span></td>
+                            </tr>
+                            <tr>
+                                <td>01/05/2026</td>
+                                <td>Real Madrid vs Barcelone</td>
+                                <td>1</td>
+                                <td><span class="confidence medium">61%</span></td>
+                                <td>2-1</td>
+                                <td><span class="status win">✓ Gagné</span></td>
+                            </tr>
+                            <tr>
+                                <td>30/04/2026</td>
+                                <td>Inter vs AC Milan</td>
+                                <td>BTTS Yes</td>
+                                <td><span class="confidence high">68%</span></td>
+                                <td>1-1</td>
+                                <td><span class="status win">✓ Gagné</span></td>
+                            </tr>
+                            <tr>
+                                <td>29/04/2026</td>
+                                <td>Bayern vs Dortmund</td>
+                                <td>Over 2.5</td>
+                                <td><span class="confidence medium">58%</span></td>
+                                <td>1-0</td>
+                                <td><span class="status loss">✗ Perdu</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
